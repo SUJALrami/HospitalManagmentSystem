@@ -1,0 +1,116 @@
+{% extends 'reception/base.html' %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold text-gray-800">
+        Operations Desk <span class="text-sm font-normal text-gray-500 ml-2">{{ today }}</span>
+        <a href="{% url 'new_appointment' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow transition duration-200">+ New Walk-In</a>
+    </h1>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:col-span-2">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="font-bold text-gray-700">Today's Appointments (Queue)</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Time</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Patient</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Doctor</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
+                        <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for appt in appointments %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-700 font-mono">{{ appt.time_slot }}</td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm font-medium text-gray-900">{{ appt.patient.name }}</div>
+                            <div class="text-xs text-gray-500">{{ appt.patient.phone }}</div>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{{ appt.doctor }}</td>
+                        <td class="px-4 py-3 text-sm">
+                            {% if appt.status == 'SCHEDULED' %} <span class="text-orange-600 font-bold">Scheduled</span>
+                            {% elif appt.status == 'WAITING' %} <span class="text-blue-600 font-bold">Waiting</span>
+                            {% elif appt.status == 'COMPLETED' %} <span class="text-green-600 font-bold">Done</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if appt.status == 'SCHEDULED' %}
+                                <a href="{% url 'mark_arrived' appt.id %}" class="bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-1 px-2 rounded">Mark Arrived</a>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="p-6 text-center text-gray-500">No appointments today.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:col-span-1">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h3 class="font-bold text-gray-700">💰 Pending Payments</h3>
+        </div>
+
+
+        <div class="p-4 bg-gray-50 border-b border-gray-200">
+            <form method="GET" class="flex gap-2">
+                <input type="text" name="q" placeholder="Search Name or Phone..." class="flex-1 px-3 py-1 text-sm border rounded focus:ring-1 focus:ring-blue-500">
+                <button type="submit" class="bg-gray-600 text-white px-3 py-1 rounded text-sm">🔍</button>
+            </form>
+        </div>
+
+        <table class="min-w-full">
+            <thead class="bg-gray-100 border-b border-gray-200">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Patient</th>
+                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Amount</th>
+                    <th class="px-4 py-2 text-center text-xs font-bold text-gray-500 uppercase">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for inv in invoices %}
+                <tr>
+                    <td class="px-4 py-3">
+                        <div class="text-sm font-medium text-gray-900">{{ inv.patient.name }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ inv.patient.phone }}</div>
+                    </td>
+                    <td class="text-red-600 font-bold text-sm">₹{{ inv.amount }}</td>
+                    <td class="px-4 py-3 space-y-2">
+                        {% if inv.is_paid %}
+                            <a href="{% url 'download_invoice_pdf' inv.id %}" 
+                            class="block w-full bg-gray-700 hover:bg-gray-800 text-white text-xs font-bold py-1 px-2 rounded text-center transition">
+                            📄 Receipt
+                            </a>
+                        {% else %}
+                            <a href="{% url 'mark_paid' inv.id %}" 
+                            onclick="return confirm('Collect ₹{{ inv.amount }} CASH?')"
+                            class="block w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1 px-2 rounded text-center transition">
+                            💵 Collect Cash
+                            </a>
+
+                            <a href="{% url 'create_checkout_session' inv.id %}" 
+                            class="block w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-1 px-2 rounded text-center transition">
+                            💳 Stripe Card
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="p-6 text-center text-gray-500 text-sm">No pending bills.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

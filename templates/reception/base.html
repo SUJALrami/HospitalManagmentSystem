@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reception Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden font-sans">
+    
+    <div class="w-64 bg-gray-800 text-white flex flex-col shadow-xl flex-shrink-0">
+        <div class="h-16 flex items-center justify-center border-b border-gray-700 bg-gray-900">
+            <h2 class="text-xl font-bold tracking-wide">🏥 Reception</h2>
+        </div>
+
+        <nav class="flex-1 px-2 py-4 space-y-2 overflow-y-auto">
+            <a href="{% url 'reception_dashboard' %}" class="flex items-center px-4 py-3 rounded hover:bg-gray-700 transition duration-200">
+                <span class="mr-3 text-lg">🖥️</span> Operations Desk
+            </a>
+            <a href="{% url 'new_appointment' %}" class="flex items-center px-4 py-3 rounded hover:bg-gray-700 transition duration-200">
+                <span class="mr-3 text-lg">📅</span> New Appointment
+            </a>
+        </nav>
+        <div class="p-4 border-t border-gray-700 bg-gray-900">
+            <a href="{% url 'custom_login' %}" class="block w-full bg-red-600 hover:bg-red-700 text-white text-center font-bold py-2 rounded transition duration-200">
+                Logout
+            </a>
+        </div>
+    </div>
+
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-8">
+            {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                        <div class="p-4 rounded-lg shadow-sm text-sm font-semibold flex items-center
+                            {% if message.tags == 'error' %} bg-red-100 text-red-700 border-l-4 border-red-500
+                            {% elif message.tags == 'success' %} bg-green-100 text-green-700 border-l-4 border-green-500
+                            {% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

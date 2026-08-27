@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+
+    <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+        
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">🏥 Hospital Login</h2>
+            <p class="text-gray-500 text-sm mt-1">Secure Access Portal</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded text-sm text-center font-medium
+                    {% if message.tags == 'error' %} bg-red-100 text-red-700 border border-red-200
+                    {% elif message.tags == 'success' %} bg-green-100 text-green-700 border border-green-200
+                    {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Username or Email</label>
+                <input type="text" name="login_id" placeholder="Enter ID or Email" required 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200">
+            </div>
+
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                <input type="password" name="password" placeholder="********" required 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200">
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 transform hover:scale-[1.02]">
+                Secure Login
+            </button>
+        </form>
+
+        <div class="border-t border-gray-200 my-6"></div>
+
+        <div class="text-center mb-6">
+            <p class="text-sm text-gray-600">New Patient?</p>
+            <a href="{% url 'patient_register' %}" class="text-blue-600 hover:text-blue-800 font-bold hover:underline">
+                Create Account
+            </a>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-center">
+            <p class="text-xs text-gray-500 leading-relaxed">
+                <span class="font-bold text-gray-700 block mb-1">Staff & Doctors:</span>
+                Please contact Admin for credentials.<br>
+                You cannot self-register.
+            </p>
+        </div>
+
+    </div>
+
+</body>
+</html>

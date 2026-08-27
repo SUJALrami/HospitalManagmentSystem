@@ -1,0 +1,72 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-end">
+    <h1 class="text-2xl font-bold text-gray-800">Daily Reports <span class="text-gray-500 text-lg font-normal ml-2">{{ today }}</span></h1>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:col-span-1">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="font-bold text-gray-700">💰 Revenue Breakdown</h3>
+        </div>
+        <table class="min-w-full">
+            <tbody class="divide-y divide-gray-200">
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">Cash Collected</td>
+                    <td class="px-6 py-4 text-sm font-bold text-green-600 text-right">₹{{ cash_total }}</td>
+                </tr>
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-700">Online / UPI</td>
+                    <td class="px-6 py-4 text-sm font-bold text-blue-600 text-right">₹{{ online_total }}</td>
+                </tr>
+                <tr class="bg-gray-50">
+                    <td class="px-6 py-4 text-sm font-bold text-gray-900">Total</td>
+                    <td class="px-6 py-4 text-sm font-bold text-gray-900 text-right">₹{{ cash_total|add:online_total }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:col-span-2">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="font-bold text-gray-700">📋 Staff Attendance</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Staff Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">In Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Out Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for log in attendance_logs %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ log.user.first_name }} {{ log.user.last_name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ log.user.role }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ log.in_time|default:"-" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ log.out_time|default:"-" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if log.is_present %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Present</span>
+                            {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Absent</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-500 text-sm">No attendance records for today.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
